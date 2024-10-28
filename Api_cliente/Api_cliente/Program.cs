@@ -1,4 +1,7 @@
 
+using Api_cliente.DAL;
+using Microsoft.EntityFrameworkCore;
+
 namespace Api_cliente
 {
     public class Program
@@ -14,14 +17,22 @@ namespace Api_cliente
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            //Obtenemos el ConStr
+            var ConStr = builder.Configuration.GetConnectionString("ConStr");
+            // Agregamos el contexto al builder con el ConStr
+            builder.Services.AddDbContext<Contexto>(Options => Options.UseSqlite(ConStr));
+
+            builder.Services.AddCors(options => {
+                options.AddPolicy("AllowAnyOrigin", builder => builder.AllowAnyOrigin()
+                                                                      .AllowAnyMethod()
+                                                                      .AllowAnyHeader());
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
 
             app.UseHttpsRedirection();
 
